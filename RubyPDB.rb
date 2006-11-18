@@ -3,7 +3,91 @@
 # copyright 2005, Chris Riddoch
 # loading and unloading code shamelessly borrowed from Palm::PDB.  sort of...
 
-require "yaml"
+require 'yaml'
+
+class AppCategory
+  attr_accessor :name, :id, :renamed
+end
+
+class StdAppInfoBlock
+  attr_accessor :categories, :lastuniqueid, :other
+  @@num_categories = 16
+  @@category_length = 16
+  @@app_info_size = 2 + (@@category_length * @@num_categories) +
+    @@num_categories + 1 + 1
+
+  def initialize()
+    @categories = []
+  end
+
+  def parse(input)
+    unpackstr = "n" +  # Renamed categories
+                ("A" + @@category_length.to_s) * @@num_categories + # Category labels
+                "C" * @@num_categories + # Category IDs
+                "C" + # Last unique ID
+                "x"
+
+    stuff = input.unpack(unpackstr)
+
+    data = {}
+    @renamed = stuff.shift
+    @labels = []
+    @@num_categories.times {
+      @labels << stuff.shift
+    }
+    @uniqueids = []
+    @@num_categories.times {
+      @uniqueids << stuff.shift
+    }
+    @lastuniqueid = stuff.shift
+
+    @@num_categories.times { |i|
+      cat = AppCategory.new()
+      if @renamed & (1 << i)
+        cat.renamed = true
+      else
+        cat.renamed = false
+      end
+
+      cat.name = @labels[i]
+      cat.id = @uniqueids[i]
+      @categories << cat
+    }
+
+    @other = input[@@app_info_size, input.length - @@app_info_size]
+  end
+
+  def pack
+    # Create the bitfield of renamed categories:
+    renamed = 0
+    @categories.each_with_index { |c, i|
+      if c.renamed
+        renamed |= (1 << i)
+      end
+    }
+    retval = [renamed].pack("n")
+
+    if (@categories.length < 16)
+      puts "Ack! Too few categories!"
+    end
+
+    @categories.each {|c|
+      retval += [c.name].pack("a16")
+    }
+
+    @categories.each {|c|
+      retval += [c.id].pack("C")
+    }
+
+    retval += [@lastuniqueid].pack("Cx")
+
+
+    return retval
+
+  end
+end
+
+
 
 $header_length = 72
 $record_index_header_length = 6
@@ -19,7 +103,7 @@ class RecordEntry
   }
   @@record_index_length = 8
 
-  attr_accessor :offset, :attribute, :id, :length, :buffer
+  attr_accessor :offset, :attribute, :id, :length, :buffer, :data
 
   def initialize(f)
     buffer = f.read(@@record_index_length)
@@ -34,9 +118,6 @@ class RecordEntry
         @attribute[flag] = false
       end
     }
-  end
-
-  def load
   end
 end
 
@@ -69,6 +150,8 @@ class PDB_block
 end
 
 class PalmPDB
+  attr_reader :records, :app_info
+
   @@attribute_flags = {
     "resource" => 0x0001,
     "read-only" => 0x0002,
@@ -117,7 +200,7 @@ class PalmPDB
  
     @ctime = Time.at(@ctime - $EPOCH_1904)
     @mtime = Time.at(@mtime - $EPOCH_1904)
-    @baktime = Time.at(@baktime)
+    # @baktime = Time.at(@baktime)
 
     @attribute = Hash.new()
     @@attribute_flags.each_pair { |flag, mask|
@@ -169,9 +252,9 @@ class PalmPDB
     positions.each do | block |
       case block.name
       when :appinfo
-         @appinfo = block.read_from_stream(f)
+         @appinfo_data = block.read_from_stream(f)
       when :sortinfo
-        @sortinfo = block.read_from_stream(f)
+         @sortinfo = block.read_from_stream(f)
       when :first_record
         f.pos = block.position
         compute_record_sizes
@@ -186,13 +269,22 @@ class PalmPDB
     end
     @index = nil
 
+    if (@appinfo_offset > 0)
+      @app_info = StdAppInfoBlock.new()
+      @app_info.parse(@appinfo_data)
+    end
 
-    puts self.to_yaml
+    parse_app_info(@app_info.other)
+    # puts self.to_yaml
+  end
+
+  def parse_app_info(data)
+    # Normally, do nothing.  Subclasses override
   end
 
   def load_resource_index(f)
     @number_of_records.times do |i|
-      rie = ResourceEntry.new(f)
+      rie = @resourceclass.new(f)
       @index << rie
     end
   end
@@ -200,7 +292,7 @@ class PalmPDB
   def load_record_index(f)
     lastoffset = 0
     @number_of_records.times do |i|
-      rie = RecordEntry.new(f)
+      rie = @recordclass.new(f)
       if rie.offset == lastoffset
         puts "Record #{i} has same offset as previous one: #{rie.offset}"
       end
@@ -231,6 +323,4 @@ class PalmPDB
   end
 end
 
-a = PalmPDB.new()
-a.open_PDB_file("fuelLogDB.pdb")
 
