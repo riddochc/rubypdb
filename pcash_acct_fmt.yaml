@@ -1,0 +1,11 @@
+---
+class: AccountRecord
+struct:
+ - name: balance
+   type: G
+ - name: checkno
+   type: S
+ - name: name
+   type: variable_to_null
+ - name: source
+   type: variable_to_null

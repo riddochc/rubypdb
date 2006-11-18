@@ -4,6 +4,7 @@
 # loading and unloading code shamelessly borrowed from Palm::PDB.  sort of...
 
 require 'yaml'
+require 'stringio'
 
 class AppCategory
   attr_accessor :name, :id, :renamed
@@ -252,7 +253,14 @@ class PalmPDB
     positions.each do | block |
       case block.name
       when :appinfo
-         @appinfo_data = block.read_from_stream(f)
+        @appinfo_data = block.read_from_stream(f)
+
+        if (@appinfo_offset > 0)
+          @app_info = StdAppInfoBlock.new()
+          @app_info.parse(@appinfo_data)
+        end
+
+        parse_app_info(@app_info.other)
       when :sortinfo
          @sortinfo = block.read_from_stream(f)
       when :first_record
@@ -269,12 +277,6 @@ class PalmPDB
     end
     @index = nil
 
-    if (@appinfo_offset > 0)
-      @app_info = StdAppInfoBlock.new()
-      @app_info.parse(@appinfo_data)
-    end
-
-    parse_app_info(@app_info.other)
     # puts self.to_yaml
   end
 
@@ -309,6 +311,7 @@ class PalmPDB
       record.buffer = f.read(record.length)
       record.load
     end
+    record.post_load(self)
   end
 
   def compute_record_sizes()

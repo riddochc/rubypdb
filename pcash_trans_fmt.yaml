@@ -1,0 +1,17 @@
+---
+class: TransactionRecord
+struct:
+ - name: account
+   type: N
+ - name: amount
+   type: G
+ - name: date
+   type: n
+ - name: transtype
+   type: c
+ - name: party
+   type: variable_to_null
+ - name: ref
+   type: variable_to_null
+ - name: note
+   type: variable_to_null
