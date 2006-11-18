@@ -82,12 +82,9 @@ class StdAppInfoBlock
 
     retval += [@lastuniqueid].pack("Cx")
 
-
     return retval
-
   end
 end
-
 
 
 $header_length = 72
@@ -309,9 +306,8 @@ class PalmPDB
         f.pos = record.offset
       end
       record.buffer = f.read(record.length)
-      record.load
+      record.load(self)
     end
-    record.post_load(self)
   end
 
   def compute_record_sizes()
