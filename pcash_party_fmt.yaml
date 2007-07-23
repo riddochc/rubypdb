@@ -1,5 +1,0 @@
----
-class: PartyRecord
-struct:
- - name: party
-   type: variable_to_null
