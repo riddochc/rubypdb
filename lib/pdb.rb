@@ -1,5 +1,9 @@
 require 'bit-struct'
 require 'enumerator'
+require 'yaml'
+
+libdir = File.split(__FILE__).first
+require libdir + '/common.rb'
 
 module PDB
 end
@@ -46,7 +50,7 @@ end
 
 class PDB::Resource < BitStruct
   text     :type,   8 * 4
-  unsigned :id,     8 * 2
+  unsigned :r_id,     8 * 2
   unsigned :offset, 8 * 4
 end
 
@@ -64,9 +68,8 @@ end
 class PDB::Record < BitStruct
   unsigned :offset, 8 * 4
   nest     :attributes,  PDB::RecordAttributes
-  unsigned :id,     8 * 3
+  unsigned :r_id,     8 * 3
 end
-
 
 class PDB::StandardAppInfoBlock < BitStruct
   unsigned  :renamed_categories,  8 * 2
@@ -80,6 +83,18 @@ class PDB::StandardAppInfoBlock < BitStruct
   rest     :rest
 end
 
+# Higher-level interface to PDB::StandardAppInfoBlock
+class PDB::AppInfo
+  def initialize()
+  end
+end
+
+# This is a high-level interface to PDB::Resource / PDB::Record
+# PDB::RecordAttributes, and the data of the record/resource
+class PDB::Data
+  def initialize()
+  end
+end
 
 class PalmPDB
   attr_reader :records, :index
@@ -90,6 +105,7 @@ class PalmPDB
     @records = {}
     @appinfo = nil
     @sortinfo = nil
+    @header = PDB::Header.new()
   end
 
   def load(f)
@@ -106,7 +122,7 @@ class PalmPDB
     record_size = PDB::Record.round_byte_length
 
     @header.resource_index.number_of_records.times do |i|
-      if @header.attributes.resource == true
+      if @header.attributes.resource == 1
         @index << PDB::Resource.new(f.read(resource_size))
       else
         @index << PDB::Record.new(f.read(record_size))
@@ -121,7 +137,7 @@ class PalmPDB
     end
     # And just to be sure they're in a sensible order...
     @index = @index.sort_by {|i| i.offset }
-    
+
     # The order of things following the headers:
     #   1- Appinfo, Sortinfo, Records
     #   2 - Appinfo, Records
@@ -161,33 +177,96 @@ class PalmPDB
       length = nxt.offset - curr.offset  # Find the length to the next record
       f.pos = curr.offset
       data = f.read(length)
-      @records[curr.id] = data
+      @records[curr.r_id] = data
       i = i + 1 
     end
     # ... And then the last one.
     entry = @index.last
     f.pos = entry.offset
     data = f.read()  # Read to the end
-    @records[entry.id] = data
+    @records[entry.r_id] = data
   end
 
   def each(&block)
     @index.each {|i|
-      yield i, @records[i.id]
+      yield i, @records[i.r_id]
     }
   end
 
-
-  $EPOCH_1904 = 2082844800
   def ctime()
-    Time.at(@header.ctime - $EPOCH_1904)
+    Time.from_palm(@header.ctime)
+  end
+
+  def ctime=(t)
+    @header.ctime = t.to_palm
   end
 
   def mtime()
-    Time.at(@header.mtime - $EPOCH_1904)
+    Time.from_palm(@header.mtime)
+  end
+
+  def mtime=(t)
+    @header.mtime = t.to_palm
   end
 
   def backup_time()
-    Time.at(@header.baktime - $EPOCH_1904)
+    Time.from_palm(@header.baktime)
+  end
+
+  def backup_time=(t)
+    @header.baktime = t.to_palm
+  end
+  
+  # This should be done before dumping or doing a deeper serialization.
+  def recompute_offsets()
+    @header.resource_index.number_of_records = @records.length
+    @header.resource_index.next_index = 0 # TODO: How is this determined?
+
+    curr_offset = PDB::Header.round_byte_length
+
+    # Compute length of index...
+    unless @index == []
+      @index.each do |i|
+        curr_offset += i.length()
+      end
+    end
+
+    unless @appinfo.nil?
+      @header.appinfo_offset = curr_offset
+      curr_offset += @appinfo.length()
+    end
+
+    unless @sortinfo.nil?
+      @header.sortinfo_offset = curr_offset
+      curr_offset += @sortinfo.length()
+    end
+
+    unless @index.length == 0
+      @index.each do |i|
+        i.offset = curr_offset
+        curr_offset += @records[i.r_id].length
+      end
+    end
+  end
+
+  def dump(f)
+    recompute_offsets()
+    f.write(@header)
+
+    @index.each do |i|
+      f.write(i)
+    end
+
+    unless @appinfo.nil?
+      f.write(@appinfo)
+    end
+
+    unless @sortinfo.nil?
+      f.write(@sortinfo)
+    end
+
+    @index.each do |i|
+      f.write(@records[i.r_id])
+    end
   end
 end
