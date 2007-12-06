@@ -59,10 +59,7 @@ class PDB::RecordAttributes < BitStruct
   unsigned :dirty,  1  # 0x040
   unsigned :busy,   1  # 0x020
   unsigned :secret, 1  # 0x010
-  unsigned :attr4,  1  # 0x008
-  unsigned :attr3,  1  # 0x004
-  unsigned :attr2,  1  # 0x002
-  unsigned :attr1,  1  # 0x001
+  unsigned :category,  4  # 0x008 - 0x001
 end
 
 class PDB::Record < BitStruct
