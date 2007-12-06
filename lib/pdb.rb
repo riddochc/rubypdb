@@ -249,13 +249,38 @@ class PalmPDB
     if appinfo_length > 0
       f.pos = @header.appinfo_offset
       @appinfo_data = f.read(appinfo_length)
-      @appinfo = PDB::StandardAppInfoBlock.new(@appinfo_data)
+      appinfo_class_name = self.class.name + "::AppInfo"
+      
+      begin
+        appinfo_class = Kernel.const_get_from_string(appinfo_class_name)
+      rescue NameError
+        puts appinfo_class_name + " does not exist."
+      end
+
+      unless appinfo_class.nil?
+        @appinfo = appinfo_class.new(self, @appinfo_data)
+      else
+        @appinfo = nil
+      end
     end
 
     if sortinfo_length > 0
       f.pos = @header.sortinfo_offset
       @sortinfo_data = f.read(sortinfo_length)
-      @sortinfo = nil  # This really is app-specific, isn't it?
+
+      sortinfo_class_name = self.class.name + "::SortInfo"
+      
+      begin
+        sortinfo_class = Kernel.const_get_from_string(sortinfo_class_name)
+      rescue NameError
+        puts sortinfo_class_name + " does not exist."
+      end
+
+      unless sortinfo_class.nil?
+        @sortinfo = sortinfo_class.new(@sortinfo_data)
+      else
+        @sortinfo = nil
+      end
     end
 
     i = 0
