@@ -73,3 +73,12 @@ class String
     hex
   end
 end
+
+def Kernel.const_get_from_string(str)
+  rname_list = str.split('::')
+  accum_class = Kernel
+  rname_list.each {|c|
+    accum_class = accum_class.const_get(c.to_sym)
+  }
+  accum_class
+end
