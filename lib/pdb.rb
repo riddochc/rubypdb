@@ -82,20 +82,109 @@ end
 
 # Higher-level interface to PDB::StandardAppInfoBlock
 class PDB::AppInfo
-  def initialize()
+  attr_accessor :struct
+
+  def initialize(standard_appinfo, pdb, *rest)
+    @standard_appinfo = standard_appinfo
+    @pdb = pdb
+    data = rest.first
+
+    unless data.nil?
+      load(data)
+    end
+  end
+
+  def load(data)
+    if @standard_appinfo == true
+      # Using standard app info block
+      @data = PDB::StandardAppInfoBlock.new(data)
+
+      appinfo_struct_class_name = self.class.name + "::Struct"
+      begin
+       appinfo_struct_class = Kernel.const_get_from_string(appinfo_struct_class_name)
+      rescue NameError
+        puts appinfo_struct_class_name + " does not exist."
+      end
+
+      unless appinfo_struct_class.nil?
+        @struct = appinfo_struct_class.new(@data.rest)
+      end
+    else
+      # Not using standard app info block.
+      # In this case, this function should be overwritten by subclass.
+      @data = data
+    end
+  end
+
+  def dump()
+    unless @struct.nil?
+      return @struct.to_s
+    else
+      return @data
+    end
+  end
+
+  def length()
+    unless @struct.nil?
+      return @struct.round_byte_length()
+    else
+      return @data.length
+    end
   end
 end
 
 # This is a high-level interface to PDB::Resource / PDB::Record
 # PDB::RecordAttributes, and the data of the record/resource
 class PDB::Data
-  def initialize()
+  attr_accessor :struct
+
+  def initialize(pdb, index, *rest)
+    @pdb = pdb
+    @index = index
+    record = rest.first
+
+    unless record.nil?
+      load(record)
+    end
+  end
+
+  def load(data)
+    format_class_name = self.class.name + "::Struct"
+    begin
+      format_class = Kernel.const_get_from_string(format_class_name)
+    rescue NameError
+      puts format_class_name + " does not exist."
+    end
+
+    unless format_class.nil?
+      @struct = format_class.new(data)
+    end
+
+    @data = data
+  end
+
+
+  def dump()
+    unless @struct.nil?
+      return @struct.to_s
+    else
+      return @data
+    end
+  end
+
+  def length()
+    unless @struct.nil?
+      return @struct.round_byte_length()
+    else
+      return @data.length
+    end
   end
 end
 
 class PalmPDB
   attr_reader :records, :index
   attr_accessor :header, :appinfo, :sortinfo
+  include Enumerable
 
   def initialize()
     @index = []
