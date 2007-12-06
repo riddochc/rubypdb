@@ -185,8 +185,12 @@ class PalmPDB
   end
 
   def each(&block)
+    # This is some deep hackery: rclass will be the constant PDB::Something::Record
+    rname_list = self.class.name.split('::')
+    rclass = PDB.const_get(rname_list[1].to_sym).const_get(:Record)
+
     @index.each {|i|
-      yield i, @records[i.r_id]
+      r = yield rclass.new(self, i, @records[i.r_id])
     }
   end
 
