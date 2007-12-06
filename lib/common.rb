@@ -38,7 +38,7 @@ class Date
 end
 
 class String
-  def hexdump(params)
+  def hexdump(params = {})
     offset = params[:offset] || 0
     width = params[:width] || 16
     result = []
