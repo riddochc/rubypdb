@@ -103,7 +103,7 @@ class PDB::AppInfo
       begin
        appinfo_struct_class = Kernel.const_get_from_string(appinfo_struct_class_name)
       rescue NameError
-        puts appinfo_struct_class_name + " does not exist."
+        #puts appinfo_struct_class_name + " does not exist."
       end
 
       unless appinfo_struct_class.nil?
@@ -118,7 +118,10 @@ class PDB::AppInfo
 
   def dump()
     unless @struct.nil?
-      return @struct.to_s
+      if @standard_appinfo == true
+        @data.rest = @struct.to_s
+      end
+      return @data.to_s
     else
       return @data
     end
@@ -126,7 +129,10 @@ class PDB::AppInfo
 
   def length()
     unless @struct.nil?
-      return @struct.round_byte_length()
+      if @standard_appinfo == true
+         @data.rest = @struct.to_s
+      end
+      return @data.length
     else
       return @data.length
     end
@@ -136,11 +142,11 @@ end
 # This is a high-level interface to PDB::Resource / PDB::Record
 # PDB::RecordAttributes, and the data of the record/resource
 class PDB::Data
-  attr_accessor :struct
+  attr_accessor :struct, :metadata
 
-  def initialize(pdb, index, *rest)
+  def initialize(pdb, metadata, *rest)
     @pdb = pdb
-    @index = index
+    @metadata = metadata
     record = rest.first
 
     unless record.nil?
@@ -153,9 +159,10 @@ class PDB::Data
     begin
       format_class = Kernel.const_get_from_string(format_class_name)
     rescue NameError
-      puts format_class_name + " does not exist."
+      # puts format_class_name + " does not exist."
     end
 
+    # puts "Format class: #{format_class}"
     unless format_class.nil?
       @struct = format_class.new(data)
     end
@@ -174,7 +181,7 @@ class PDB::Data
 
   def length()
     unless @struct.nil?
-      return @struct.round_byte_length()
+      return @struct.length()
     else
       return @data.length
     end
@@ -283,28 +290,36 @@ class PalmPDB
       end
     end
 
+    if @header.attributes.resource == 1  # Is it a resource, or a record?
+      data_class_name = self.class.name + "::Resource"
+    else
+      data_class_name = self.class.name + "::Record"
+    end
+
+    data_class = PDB::Data
+    begin
+      data_class = Kernel.const_get_from_string(data_class_name)
+    rescue
+    end
+
     i = 0
     @index.each_cons(2) do |curr, nxt|
       length = nxt.offset - curr.offset  # Find the length to the next record
       f.pos = curr.offset
       data = f.read(length)
-      @records[curr.r_id] = data
+      @records[curr.r_id] = data_class.new(self, curr, data)
       i = i + 1 
     end
     # ... And then the last one.
     entry = @index.last
     f.pos = entry.offset
     data = f.read()  # Read to the end
-    @records[entry.r_id] = data
+    @records[entry.r_id] = data_class.new(self, entry, data)
   end
 
   def each(&block)
-    # This is some deep hackery: rclass will be the constant PDB::Something::Record
-    rname_list = self.class.name.split('::')
-    rclass = PDB.const_get(rname_list[1].to_sym).const_get(:Record)
-
-    @index.each {|i|
-      r = yield rclass.new(self, i, @records[i.r_id])
+    @records.each_pair {|k, record|
+      yield(record)
     }
   end
 
@@ -356,10 +371,14 @@ class PalmPDB
       curr_offset += @sortinfo.length()
     end
 
+    ## And here's the mysterious two-byte filler.
+    #curr_offset += 2
+
     unless @index.length == 0
       @index.each do |i|
+        rec = @records[i.r_id]
         i.offset = curr_offset
-        curr_offset += @records[i.r_id].length
+        curr_offset += rec.length
       end
     end
   end
@@ -373,15 +392,16 @@ class PalmPDB
     end
 
     unless @appinfo.nil?
-      f.write(@appinfo)
+      f.write(@appinfo.dump())
     end
 
     unless @sortinfo.nil?
-      f.write(@sortinfo)
+      f.write(@sortinfo.dump())
     end
 
     @index.each do |i|
-      f.write(@records[i.r_id])
+      record = @records[i.r_id]
+      f.write(record.dump())
     end
   end
 end

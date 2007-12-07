@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb.rb')
+# require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb.rb')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb-formats', 'fuellog.rb')
 
 require 'test/unit'
 require 'yaml'
@@ -12,7 +13,7 @@ $datadir = File.join(File.dirname(__FILE__), 'data')
 
 class PDBHeaderTest < Test::Unit::TestCase
   def test_load
-    a = PalmPDB.new()
+    a = PDB::FuelLog.new()
     f = File.open($datadir + "/fuelLogDB.pdb")
     a.load(f)
     assert a.index.length == a.header.resource_index.number_of_records
@@ -27,7 +28,7 @@ class PDBHeaderTest < Test::Unit::TestCase
   end
 
   def test_load_and_dump
-    a = PalmPDB.new()
+    a = PDB::FuelLog.new()
     testfile = $datadir + "/fuelLogDB.pdb"
     f = File.open(testfile)
 
@@ -36,14 +37,16 @@ class PDBHeaderTest < Test::Unit::TestCase
     a.dump(tf)
     tf.close
 
-    # puts `hexdump -C #{tf.path}`
+    puts
+    puts `hexdump -C #{tf.path}`
     recreated = `pilot-file -d #{tf.path}`
+    puts recreated
     original = `pilot-file -d #{testfile}`
     assert recreated == original
   end
 
   def test_dump_from_clone()
-    pdb = PalmPDB.new
+    pdb = PDB::FuelLog.new
     pdb.header.name = 'fuelLogDB'
     pdb.header.attributes.backup = 1
     pdb.header.version = 0
@@ -53,7 +56,5 @@ class PDBHeaderTest < Test::Unit::TestCase
     pdb.header.modnum = 171
     pdb.header.type = 'Data'
     pdb.header.creator = 'dpa1'
-
-    # Now I need an API for manipulating records...
   end
 end
