@@ -12,15 +12,24 @@ require 'tempfile'
 $datadir = File.join(File.dirname(__FILE__), 'data')
 
 class PDBYamlTest < Test::Unit::TestCase
-  def test_load
+  def test_compare_yaml
     a = PDB::FuelLog.new()
     f = File.open($datadir + "/fuelLogDB.pdb")
     a.load(f)
     src_yaml = a.to_yaml
-    dest_yaml = YAML.load(File.open($datadir + "/fuelLogDB.yaml"))
-
-    puts src_yaml
+    # puts src_yaml
+    dest_yaml = File.open($datadir + "/fuelLogDB.yaml")
 
     assert src_yaml == dest_yaml
+  end
+
+  def test_compare_pdbs
+    a = PDB::FuelLog.new()
+    f = File.open($datadir + "/fuelLogDB.pdb")
+    a.load(f)
+
+    b = YAML.load(File.open($datadir + "/fuelLogDB.yaml"))
+    
+    assert a == b
   end
 end
