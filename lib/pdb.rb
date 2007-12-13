@@ -71,10 +71,10 @@ end
 class PDB::StandardAppInfoBlock < BitStruct
   unsigned  :renamed_categories,  8 * 2
   16.times do |i|
-    text      "category_#{i}".to_sym,  8 * 16
+    text      "category_name[#{i}]".to_sym,  8 * 16
   end
   16.times do |i|
-    unsigned  "category_#{i}_id".to_sym, 8 * 1
+    unsigned  "category_id[#{i}]".to_sym, 8 * 1
   end
   unsigned :last_unique_id, 8 * 1
   rest     :rest
@@ -82,7 +82,8 @@ end
 
 # Higher-level interface to PDB::StandardAppInfoBlock
 class PDB::AppInfo
-  attr_accessor :struct
+  attr_accessor :struct, :standard_appinfo, :data
+  attr_reader :categories
 
   def initialize(standard_appinfo, pdb, *rest)
     @standard_appinfo = standard_appinfo
@@ -98,6 +99,15 @@ class PDB::AppInfo
     if @standard_appinfo == true
       # Using standard app info block
       @data = PDB::StandardAppInfoBlock.new(data)
+
+      # Define better structures for categories.
+      # It's a list, of length 16.
+      # At each position, there's a one-element hash. of name and id.
+      @categories = []
+      16.times do |i|
+        @categories[i] = { 'name' => @data.send("category_name[#{i}]"),
+                           'id' => @data.send("category_id[#{i}]") }
+      end
 
       appinfo_struct_class_name = self.class.name + "::Struct"
       begin
