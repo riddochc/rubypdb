@@ -147,6 +147,24 @@ class PDB::AppInfo
       return @data.length
     end
   end
+
+  
+  yaml_as "tag:syntacticsugar.org,2007:palm_appinfo"
+
+  def to_yaml(opts = {})
+    YAML::quick_emit( self.object_id, opts ) do |out|
+      out.map( to_yaml_style ) do |map|
+        map.add('Standard_appinfo', self.standard_appinfo)
+        if self.standard_appinfo == true
+          map.add('Categories', self.categories)
+          map.add('Renamed_categories', self.data.renamed_categories)
+          map.add('Last_unique_id', self.data.last_unique_id)
+        end
+        map.add('Custom_data', self.struct)
+      end
+    end
+  end
+
 end
 
 # This is a high-level interface to PDB::Resource / PDB::Record
@@ -196,6 +214,18 @@ class PDB::Data
       return @data.length
     end
   end
+
+  def metadata_struct()
+    { # 'metadata' => self.metadata,
+     'internal_id' => self.metadata.r_id,
+     'delete' => (self.metadata.attributes.delete == '1' ? true : false),
+     'dirty' => (self.metadata.attributes.dirty == '1' ? true : false),
+     'busy' => (self.metadata.attributes.busy == '1' ? true : false),
+     'secret' => (self.metadata.attributes.secret == '1' ? true : false),
+     'category' => self.metadata.attributes.category,
+    }
+  end
+
 end
 
 class PalmPDB
@@ -413,5 +443,28 @@ class PalmPDB
       record = @records[i.r_id]
       f.write(record.dump())
     end
+  end
+
+  yaml_as "tag:syntacticsugar.org,2007:palm_db"
+
+  def to_yaml(opts = {})
+    YAML::quick_emit( self.object_id, opts ) do |out|
+        out.map( to_yaml_style ) do |map|
+          map.add('Name', self.header.name)
+          map.add('Type', self.header.type)
+          map.add('Creator', self.header.creator)
+          map.add('Version', self.header.version)
+          map.add('Creation_time', self.ctime)
+          map.add('Modification_time', self.mtime)
+          map.add('Backup_time', self.backup_time)
+          map.add('Mod_number', self.header.modnum)
+          map.add('Unique_ID', self.header.uniqueid)
+          map.add('Next_index', self.header.resource_index.next_index)
+          map.add('Flags', self.header.attributes)
+          map.add('AppInfo', self.appinfo) unless self.appinfo == nil
+          map.add('SortInfo', self.sortinfo) unless self.sortinfo == nil
+          map.add('Records', self.records.values)
+        end
+      end
   end
 end
