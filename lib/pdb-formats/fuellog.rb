@@ -47,6 +47,23 @@ class PDB::FuelLog::Record < PDB::Data
   def notes
     @struct.notes
   end
+
+  def to_yaml(opts = {})
+    YAML::quick_emit( self.object_id, opts ) do |out|
+      out.map( to_yaml_style ) do |map|
+        map.add('Date', self.date)
+        map.add('Odometer', self.odometer)
+        map.add('Price', self.price)
+        map.add('Gallons', self.gallons)
+        if @struct.fulltank == 1
+          map.add('Full_tank', true)
+        else
+          map.add('Full_tank', false)
+        end
+        map.add('Metadata', metadata_struct())
+      end
+    end
+  end
 end
 
 class PDB::FuelLog::Record::Struct < BitStruct
