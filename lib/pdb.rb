@@ -148,7 +148,6 @@ class PDB::AppInfo
     end
   end
 
-  
   yaml_as "tag:syntacticsugar.org,2007:palm_appinfo"
 
   def to_yaml(opts = {})
@@ -156,11 +155,19 @@ class PDB::AppInfo
       out.map( to_yaml_style ) do |map|
         map.add('Standard_appinfo', self.standard_appinfo)
         if self.standard_appinfo == true
-          map.add('Categories', self.categories)
+          cats = []
+          self.categories.each do |c|
+            unless c['name'] == ""
+              cats << c
+            end
+          end
+          map.add('Categories', cats)
           map.add('Renamed_categories', self.data.renamed_categories)
           map.add('Last_unique_id', self.data.last_unique_id)
+          map.add('Custom_Appinfo_Data', self.struct)
+        else
+          map.add('Data', @data)
         end
-        map.add('Custom_data', self.struct)
       end
     end
   end
