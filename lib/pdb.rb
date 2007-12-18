@@ -113,10 +113,10 @@ class PDB::AppInfo
       begin
        appinfo_struct_class = Kernel.const_get_from_string(appinfo_struct_class_name)
       rescue NameError
-        #puts appinfo_struct_class_name + " does not exist."
+        puts appinfo_struct_class_name + " does not exist."
       end
 
-      unless appinfo_struct_class.nil?
+      unless appinfo_struct_class.nil? or appinfo_struct_class == Struct
         @struct = appinfo_struct_class.new(@data.rest)
       end
     else
@@ -220,7 +220,7 @@ class PDB::Data
     end
 
     # puts "Format class: #{format_class}"
-    unless format_class.nil?
+    unless format_class.nil? or format_class == Struct
       @struct = format_class.new(data)
     end
 
