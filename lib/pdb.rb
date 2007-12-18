@@ -126,6 +126,28 @@ class PDB::AppInfo
     end
   end
 
+  # If val is an integer, find the string for the category at that index.
+  # If it's a string, return the index of the category with that name.
+  def category(val)
+    if val.is_a? Integer
+      return @categories[val]['name']
+    else
+      found = nil
+      @categories.each_with_index do |i, c|
+        if c['name'] == val
+          found = i
+          break
+        end
+      end
+
+      return num
+    end
+  end
+
+  def new_category(name)
+    puts "Making new category called #{name}"
+  end
+
   def dump()
     unless @struct.nil?
       if @standard_appinfo == true
@@ -229,10 +251,18 @@ class PDB::Data
      'dirty' => (self.metadata.attributes.dirty == '1' ? true : false),
      'busy' => (self.metadata.attributes.busy == '1' ? true : false),
      'secret' => (self.metadata.attributes.secret == '1' ? true : false),
-     'category' => self.metadata.attributes.category,
+     'category' => self.category(),
     }
   end
 
+  def category()
+    @pdb.appinfo.category(self.metadata.attributes.category)
+  end
+
+  def category=(val)
+    cat = @pdb.appinfo.category(val) || @pdb.appinfo.new_category(val)
+    @metadata.category = cat
+  end
 end
 
 class PalmPDB
