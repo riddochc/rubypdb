@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'pdb')
-require File.join(File.dirname(__FILE__), '..', 'common')
+
+require File.join(File.dirname(__FILE__), '..', 'rubypdb', 'common')
+require File.join(File.dirname(__FILE__), '..', 'rubypdb', 'pdb')
 require 'iconv'
 
 class PDB::MemoDB < PalmPDB

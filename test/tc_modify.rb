@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb.rb')
+# require File.join(File.dirname(__FILE__), '..', 'lib', 'rubypdb', 'pdb.rb')
 require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb-formats', 'fuellog.rb')
 
 require 'test/unit'

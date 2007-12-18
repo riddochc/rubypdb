@@ -2,9 +2,6 @@ require 'bit-struct'
 require 'enumerator'
 require 'yaml'
 
-libdir = File.split(__FILE__).first
-require libdir + '/common.rb'
-
 module PDB
 end
 
