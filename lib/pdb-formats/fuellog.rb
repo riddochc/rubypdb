@@ -24,16 +24,39 @@ class PDB::FuelLog::AppInfo::Struct < BitStruct
 end
 
 class PDB::FuelLog::Record < PDB::Data
+  def initialize(pdb, *rest)
+    metadata = PDB::Record.new()
+    metadata.attributes = PDB::RecordAttributes.new()
+    @struct = PDB::FuelLog::Record::Struct.new()
+    super(pdb, metadata, *rest)
+  end
+
+  def odometer=(val)
+    @struct.odometer = val.to_i
+  end
+
   def gallons
     @struct.gallons.to_f / (10 ** @pdb.appinfo.struct.fuel_dec)
+  end
+
+  def gallons=(val)
+    @struct.gallons = val.to_f * (10 ** @pdb.appinfo.struct.fuel_dec)
   end
 
   def price
     @struct.total_price.to_f / (10 ** @pdb.appinfo.struct.price_dec)
   end
 
+  def price=(val)
+    @struct.total_price = val.to_f * (10 ** @pdb.appinfo.struct.price_dec)
+  end
+
   def date
     Date.from_palm(@struct.date)
+  end
+
+  def date=(d)
+    @struct.date = d.to_palm
   end
 
   def odometer
@@ -42,6 +65,14 @@ class PDB::FuelLog::Record < PDB::Data
 
   def fulltank
     @struct.fulltank
+  end
+
+  def fulltank=(val)
+    if ((val == 0) or (val == false))
+      @struct.fulltank = 0
+    else
+      @struct.fulltank = 1
+    end
   end
 
   def notes
@@ -53,14 +84,14 @@ class PDB::FuelLog::Record < PDB::Data
       out.map( to_yaml_style ) do |map|
         map.add('Date', self.date)
         map.add('Odometer', self.odometer)
-        map.add('Price', self.price)
+        map.add('Total_Price', self.price)
         map.add('Gallons', self.gallons)
         if @struct.fulltank == 1
           map.add('Full_tank', true)
         else
           map.add('Full_tank', false)
         end
-        map.add('Metadata', metadata_struct())
+        map.add('Metadata', self.metadata)
       end
     end
   end
