@@ -17,10 +17,10 @@ class PDBYamlTest < Test::Unit::TestCase
     f = File.open($datadir + "/fuelLogDB.pdb")
     a.load(f)
     src_yaml = a.to_yaml
-    # puts src_yaml
-    dest_yaml = File.open($datadir + "/fuelLogDB.yaml")
 
-    assert src_yaml == dest_yaml
+    dest_yaml = File.open($datadir + "/fuelLogDB.yaml").read(nil)
+
+    assert src_yaml.to_s == dest_yaml.to_s
   end
 
   def test_compare_pdbs
@@ -29,7 +29,7 @@ class PDBYamlTest < Test::Unit::TestCase
     a.load(f)
 
     b = YAML.load(File.open($datadir + "/fuelLogDB.yaml"))
-    
+
     assert a == b
   end
 end

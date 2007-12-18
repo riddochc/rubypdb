@@ -1,2 +1,298 @@
----
+--- 
 Name: fuelLogDB
+Type: Data
+Creator: dpa1
+Version: 0
+Creation_time: 2005-06-14 03:02:09 -06:00
+Modification_time: 2005-11-02 18:34:27 -07:00
+Backup_time: 2005-10-07 03:52:39 -06:00
+Mod_number: 171
+Unique_ID: 0
+Next_index: 0
+Flags: !path.berkeley.edu,2006/bitstruct:PDB::AttributeFlags 
+  open: 0
+  unk_3: 0
+  unk_2: 0
+  unk_1: 0
+  bundle: 0
+  recyclable: 0
+  launchable: 0
+  hidden: 0
+  stream: 0
+  copy_prev: 0
+  reset: 0
+  newer_ok: 0
+  backup: 1
+  dirty: 0
+  read_only: 0
+  resource: 0
+AppInfo: 
+  Standard_appinfo: true
+  Categories: 
+  - name: Unfiled
+    id: 0
+  - name: Corolla
+    id: 17
+  Renamed_categories: 3
+  Last_unique_id: 17
+  Custom_Appinfo_Data: !path.berkeley.edu,2006/bitstruct:PDB::FuelLog::AppInfo::Struct 
+    fuel_volume: 0
+    distance_units: 2
+    efficiency_units: 0
+    category: 0
+    fuel_dec: 3
+    price_dec: 3
+    odom_dec: 0
+Records: 
+- Date: 2005-10-27
+  Odometer: 118517
+  Price: 26.298
+  Gallons: 9.672
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249881
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-05-08
+  Odometer: 112523
+  Price: 22.243
+  Gallons: 9.675
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249859
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-09-27
+  Odometer: 116937
+  Price: 29.405
+  Gallons: 10.143
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249876
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-07-13
+  Odometer: 114032
+  Price: 22.76
+  Gallons: 9.526
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249865
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-11-02
+  Odometer: 118820
+  Price: 23.564
+  Gallons: 8.862
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249882
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-08-27
+  Odometer: 115305
+  Price: 25.126
+  Gallons: 9.241
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249871
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-05-24
+  Odometer: 112825
+  Price: 21.089
+  Gallons: 9.419
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249860
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-10-03
+  Odometer: 117256
+  Price: 28.904
+  Gallons: 9.418
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249877
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-08-31
+  Odometer: 115636
+  Price: 26.61
+  Gallons: 8.993
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249872
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-05-28
+  Odometer: 113088
+  Price: 16.632
+  Gallons: 7.668
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249861
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-10-09
+  Odometer: 117566
+  Price: 27.1
+  Gallons: 8.918
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249878
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-07-26
+  Odometer: 114332
+  Price: 20.999
+  Gallons: 8.864
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249867
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-09-09
+  Odometer: 115960
+  Price: 29.075
+  Gallons: 9.695
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249873
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-06-09
+  Odometer: 113425
+  Price: 21.335
+  Gallons: 9.529
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249862
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-10-14
+  Odometer: 117858
+  Price: 26.329
+  Gallons: 9.02
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249879
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-08-07
+  Odometer: 114672
+  Price: 23.43
+  Gallons: 9.726
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249868
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-09-19
+  Odometer: 116301
+  Price: 31.21
+  Gallons: 10.27
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249874
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-10-20
+  Odometer: 118167
+  Price: 25.054
+  Gallons: 8.825
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249880
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-08-15
+  Odometer: 114981
+  Price: 23.291
+  Gallons: 9.32
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249869
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-09-22
+  Odometer: 116561
+  Price: 22.532
+  Gallons: 7.719
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249875
+    category: Corolla
+    busy: false
+    secret: false
+- Date: 2005-06-25
+  Odometer: 113729
+  Price: 22.705
+  Gallons: 9.5
+  Full_tank: true
+  Metadata: 
+    dirty: false
+    delete: false
+    internal_id: 249864
+    category: Corolla
+    busy: false
+    secret: false
