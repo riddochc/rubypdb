@@ -43,16 +43,6 @@ class PDB::AppInfo
     puts "Making new category called #{name}"
   end
 
-  def dump()
-    unless @struct.nil?
-      if @standard_appinfo == true
-        @data.rest = @struct.to_s
-      end
-      return @data.to_s
-    else
-      return @data
-    end
-  end
 
   def length()
     unless @struct.nil?
@@ -84,14 +74,6 @@ class PDB::Data
 
   def pdb=(p)
     @pdb = p
-  end
-
-  def dump()
-    unless @struct.nil?
-      return @struct.to_s
-    else
-      return @data
-    end
   end
 
   def length()
@@ -191,28 +173,6 @@ class PalmPDB
         i.offset = curr_offset
         curr_offset += rec.length
       end
-    end
-  end
-
-  def dump(f)
-    recompute_offsets()
-    f.write(@header)
-
-    @index.each do |i|
-      f.write(i)
-    end
-
-    unless @appinfo.nil?
-      f.write(@appinfo.dump())
-    end
-
-    unless @sortinfo.nil?
-      f.write(@sortinfo.dump())
-    end
-
-    @index.each do |i|
-      record = @records[i.r_id]
-      f.write(record.dump())
     end
   end
 

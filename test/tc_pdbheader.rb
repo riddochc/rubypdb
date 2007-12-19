@@ -1,7 +1,11 @@
 #!/usr/bin/env ruby
 
 # require File.join(File.dirname(__FILE__), '..', 'lib', 'rubypdb', 'pdb.rb')
-require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb-formats', 'fuellog.rb')
+$LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'rubypdb.rb'
+
+require File.join('pdb-formats', 'fuellog.rb')
 
 require 'test/unit'
 require 'yaml'
