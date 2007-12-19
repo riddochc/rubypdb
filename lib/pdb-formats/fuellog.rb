@@ -1,7 +1,5 @@
-require 'bit-struct'
-
-require File.join(File.dirname(__FILE__), '..', 'rubypdb', 'common')
-require File.join(File.dirname(__FILE__), '..', 'rubypdb', 'pdb')
+module PDB
+end
 
 class PDB::FuelLog < PalmPDB
 end
