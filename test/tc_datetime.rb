@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'rubypdb', 'common.rb')
+require 'rubypdb.rb'
 
 require 'test/unit'
 require 'yaml'

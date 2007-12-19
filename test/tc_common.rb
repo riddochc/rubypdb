@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'rubypdb', 'common.rb')
-require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb-formats', 'fuellog.rb')
-
+require 'rubypdb.rb'
 require 'test/unit'
 
 class GetConstFromStringTest < Test::Unit::TestCase

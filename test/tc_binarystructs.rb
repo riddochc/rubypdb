@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb-formats', 'fuellog.rb')
+require 'rubypdb.rb'
 
 require 'test/unit'
 
@@ -12,7 +12,7 @@ class BitStructTest < Test::Unit::TestCase
     entry = entry_hexdump.inject("") {|string, hex| string << hex.to_i(16).chr}
 
     actual = {:odometer => 112523, :gallons => 9675,
-              :date => convert_to_palm_date(Date.new(2005, 5, 8)),
+              :date => Date.new(2005, 5, 8).to_palm,
               :total_price => 22243, :flags => 1}
 
     unpacked = entry.unpack("NNnnnn")

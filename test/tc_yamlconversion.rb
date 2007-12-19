@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-# require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb.rb')
-$LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
-
 require 'rubypdb.rb'
 
 require 'test/unit'
