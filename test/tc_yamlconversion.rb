@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
 # require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb.rb')
-require File.join(File.dirname(__FILE__), '..', 'lib', 'pdb-formats', 'fuellog.rb')
+$LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'rubypdb.rb'
 
 require 'test/unit'
 require 'yaml'
@@ -29,6 +31,9 @@ class PDBYamlTest < Test::Unit::TestCase
     a.load(f)
 
     b = YAML.load(File.open($datadir + "/fuelLogDB.yaml"))
+
+    puts "The thing loaded: #{b}"
+    # puts "Number of records: #{b.records.length}"
 
     assert a == b
   end
