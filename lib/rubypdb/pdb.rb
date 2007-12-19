@@ -1,6 +1,4 @@
-require 'bit-struct'
-require 'enumerator'
-require 'yaml'
+# This defines the PalmPDB class, which represents a Palm Database as a whole.
 
 class PalmPDB
   attr_reader :records, :index

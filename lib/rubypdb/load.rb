@@ -1,5 +1,7 @@
 # This is code related to loading databases, records, resources, etc.
 
+require 'enumerator'
+
 module PDB
 end
 
