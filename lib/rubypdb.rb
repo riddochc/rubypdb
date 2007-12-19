@@ -7,6 +7,7 @@ require 'rubypdb/yaml.rb'
 require 'rubypdb/load.rb'
 require 'rubypdb/dump.rb'
 require 'rubypdb/appinfo.rb'
+require 'rubypdb/records.rb'
 
 require 'rubypdb/pdb.rb'
 
