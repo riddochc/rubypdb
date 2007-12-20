@@ -10,7 +10,7 @@ require 'tempfile'
 
 $datadir = File.join(File.dirname(__FILE__), 'data')
 
-class PDBHeaderTest < Test::Unit::TestCase
+class PDBRecordTest < Test::Unit::TestCase
   def test_load
     a = PDB::FuelLog.new()
     f = File.open($datadir + "/fuelLogDB.pdb")
