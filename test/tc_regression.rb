@@ -23,7 +23,7 @@ class RegressionTest < Test::Unit::TestCase
     assert_nothing_raised(ArgumentError) { rec.date }
     assert_not_equal rec.struct.date, 0
     assert_not_equal rec.odometer, 534
-    assert_not_equal rec.total_price, 0.0
+    assert_not_equal rec.price, 0.0
     assert_not_equal rec.gallons, 1090768.899
     assert_not_equal rec.fulltank, false
   end
