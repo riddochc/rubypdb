@@ -1,0 +1,6 @@
+---
+-
+  bugnum: 1
+  introduced_in: "65474fd9836c"
+  description: "Seems stuff is getting parsed wrong.  The FuelLog::Record::Struct is corrupted."
+ 
