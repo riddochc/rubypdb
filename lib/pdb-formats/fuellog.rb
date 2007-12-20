@@ -22,10 +22,14 @@ end
 
 class PDB::FuelLog::Record < PDB::Data
   def initialize(pdb, *rest)
-    metadata = PDB::Record.new()
-    metadata.attributes = PDB::RecordAttributes.new()
-    @struct = PDB::FuelLog::Record::Struct.new()
-    super(pdb, metadata, *rest)
+    if rest.length == 2
+      super(pdb, *rest)
+    else # Create new basic structures.
+      @pdb = pdb
+      @struct = PDB::FuelLog::Record::Struct.new()
+      @metadata = PDB::Record.new()
+      @data = nil
+    end
   end
 
   def odometer=(val)
