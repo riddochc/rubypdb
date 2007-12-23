@@ -96,7 +96,7 @@ class PalmPDB
   # This should be done before dumping or doing a deeper serialization.
   def recompute_offsets()
     @header.resource_index.number_of_records = @records.length
-    @header.resource_index.next_index = 0 # TODO: How is this determined?
+    # @header.resource_index.next_index = 0 # TODO: How is this determined?
 
     curr_offset = PDB::Header.round_byte_length
 
@@ -129,11 +129,22 @@ class PalmPDB
     end
   end
 
-  # Add a PDB::Data to the PDB
-  def <<(datum)
-    datum.pdb = self
-    # Needs to be added to @index...
-    # And to @records...
+  # Add a (possibly subclassed) PDB::Data to the PDB
+  def <<(data)
+    unless data.metadata.r_id != 0  # If it already has an r_id assigned, don't bother.
+      highest_id = @index.collect {|i| i.r_id }.max
+      data.metadata.r_id = highest_id + 1
+      res_index = @header.resource_index
+      res_index.number_of_records += 1
+      @header.resource_index = res_index
+      @index << data.metadata
+    end
+
+    self[data.metadata.r_id] = data
+  end
+
+  def []=(r_id, data)
+    @records[r_id] = data
   end
 
 end

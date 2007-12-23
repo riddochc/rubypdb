@@ -15,7 +15,7 @@ class PDBModifyingTest < Test::Unit::TestCase
     db = PDB::FuelLog.new()
     f = File.open($datadir + "/fuelLogDB.pdb")
     db.load(f)
-    
+
     r = PDB::FuelLog::Record.new(db)
     r.odometer = 140000
     r.gallons = 10.2
@@ -23,11 +23,29 @@ class PDBModifyingTest < Test::Unit::TestCase
     r.date = Date.today
     r.fulltank = true
     r.category = "Corolla"
-    
-    puts r.to_yaml
-    # db << r
-    
-    # puts db.to_yaml
+
+    db << r
+    db.recompute_offsets
+
+    tf = Tempfile.new('pdbtest')
+    tf_dump = Tempfile.new('new_dump')
+    db.dump(tf)
+    tf.close
+
+    orig_dump = Tempfile.new('orig_dump')
+    original = `pilot-file -d #{$datadir + "/fuelLogDB.pdb"} > #{orig_dump.path}`
+
+    recreated = `pilot-file -d #{tf.path} > #{tf_dump.path}`
+    diff = `diff #{orig_dump.path} #{tf_dump.path}`
+
+    correct_diff =<<_EOD_
+118a119,121
+> 21\t16\t0x0\t1\t0x3d01b
+> 0000: 00 02 22 e0 00 00 27 d8 cf 97 00 00 76 2a 00 01   .."`..'XO...v*..
+> 
+_EOD_
+
+    assert diff == correct_diff
   end
 
 end
