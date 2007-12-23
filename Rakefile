@@ -8,13 +8,13 @@ test_dir = File.expand_path('test')
 Rake::RDocTask.new('rdoc') do |t|
   t.rdoc_files.include('README', 'lib/**/*.rb')
   t.main = 'README'
-  t.title = 'Reader documentation'
+  t.title = 'RubyPDB Documentation'
 end
 
 Rake::TestTask.new('test') do |t|
   t.libs = [lib_dir, test_dir]
   t.pattern = "test/**/tc_*.rb"
-  t.warning = true
+  # t.warning = true
 end
 
 CLOBBER.include('doc', '**/*~')
