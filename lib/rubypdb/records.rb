@@ -7,13 +7,38 @@ end
 class PDB::Data
   attr_accessor :struct, :metadata
 
-  def initialize(pdb, metadata, *rest)
+  def initialize(pdb, opts = {})
     @pdb = pdb
-    @metadata = metadata
-    record = rest.first
 
-    unless record.nil?
-      load(record)
+    unless opts[:metadata].nil?
+      @metadata = opts[:metadata]
+    else
+      if opts[:metadata_class].nil?
+        if self.class.name =~ /Record$/
+          @metadata = PDB::Record.new()
+        elsif self.class.name =~ /Resource$/
+          @metadata = PDB::Resource.new()
+        end
+      else
+        @metadata = opts[:metadata_class].new()
+      end
+    end
+    
+    if opts[:data_struct_class].nil?
+      begin
+        struct_class = Kernel.const_get_from_string(self.class.name + "::Struct")
+      rescue
+      end
+    else
+      struct_class = opts[:data_struct_class]
+    end
+
+    unless opts[:binary_data].nil?
+      load(opts[:binary_data])
+    else
+      unless struct_class.nil?
+        @struct = struct_class.new()
+      end
     end
   end
 

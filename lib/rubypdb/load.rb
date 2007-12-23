@@ -113,16 +113,9 @@ class PalmPDB
     if appinfo_length > 0
       f.pos = @header.appinfo_offset
       @appinfo_data = f.read(appinfo_length)
-      appinfo_class_name = self.class.name + "::AppInfo"
-      
-      begin
-        appinfo_class = Kernel.const_get_from_string(appinfo_class_name)
-      rescue NameError
-        puts appinfo_class_name + " does not exist."
-      end
 
-      unless appinfo_class.nil?
-        @appinfo = appinfo_class.new(self, @appinfo_data)
+      unless @appinfo_class.nil?
+        @appinfo = @appinfo_class.new(self, @appinfo_data)
       else
         @appinfo = nil
       end
@@ -132,31 +125,11 @@ class PalmPDB
       f.pos = @header.sortinfo_offset
       @sortinfo_data = f.read(sortinfo_length)
 
-      sortinfo_class_name = self.class.name + "::SortInfo"
-      
-      begin
-        sortinfo_class = Kernel.const_get_from_string(sortinfo_class_name)
-      rescue NameError
-        puts sortinfo_class_name + " does not exist."
-      end
-
-      unless sortinfo_class.nil?
-        @sortinfo = sortinfo_class.new(@sortinfo_data)
+      unless @sortinfo_class.nil?
+        @sortinfo = @sortinfo_class.new(@sortinfo_data)
       else
         @sortinfo = nil
       end
-    end
-
-    if @header.attributes.resource == 1  # Is it a resource, or a record?
-      data_class_name = self.class.name + "::Resource"
-    else
-      data_class_name = self.class.name + "::Record"
-    end
-
-    data_class = PDB::Data
-    begin
-      data_class = Kernel.const_get_from_string(data_class_name)
-    rescue
     end
 
     i = 0
@@ -164,14 +137,14 @@ class PalmPDB
       length = nxt.offset - curr.offset  # Find the length to the next record
       f.pos = curr.offset
       data = f.read(length)
-      @records[curr.r_id] = data_class.new(self, curr, data)
+      @records[curr.r_id] = @data_class.new(self, :metadata => curr, :binary_data => data)
       i = i + 1 
     end
     # ... And then the last one.
     entry = @index.last
     f.pos = entry.offset
     data = f.read()  # Read to the end
-    @records[entry.r_id] = data_class.new(self, entry, data)
+    @records[entry.r_id] = @data_class.new(self, :metadata => entry, :binary_data => data)
   end
 
 end

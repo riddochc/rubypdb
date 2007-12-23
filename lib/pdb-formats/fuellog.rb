@@ -2,12 +2,20 @@ module PDB
 end
 
 class PDB::FuelLog < PalmPDB
+  def initialize()
+    super(:appinfo_class => PDB::FuelLog::AppInfo,
+          :sortinfo_class => PDB::FuelLog::SortInfo,
+          :data_class => PDB::FuelLog::Record)
+  end
 end
 
 class PDB::FuelLog::AppInfo < PDB::AppInfo
   def initialize(*rest)
     super(true, *rest)  # Uses standard categories.
   end
+end
+
+class PDB::FuelLog::SortInfo
 end
 
 class PDB::FuelLog::AppInfo::Struct < BitStruct
@@ -21,15 +29,9 @@ class PDB::FuelLog::AppInfo::Struct < BitStruct
 end
 
 class PDB::FuelLog::Record < PDB::Data
-  def initialize(pdb, *rest)
-    if rest.length == 2
-      super(pdb, *rest)
-    else # Create new basic structures.
-      @pdb = pdb
-      @struct = PDB::FuelLog::Record::Struct.new()
-      @metadata = PDB::Record.new()
-      @data = nil
-    end
+
+  def odometer
+    @struct.odometer
   end
 
   def odometer=(val)
@@ -58,10 +60,6 @@ class PDB::FuelLog::Record < PDB::Data
 
   def date=(d)
     @struct.date = d.to_palm
-  end
-
-  def odometer
-    @struct.odometer
   end
 
   def fulltank

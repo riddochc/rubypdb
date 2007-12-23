@@ -1,16 +1,66 @@
 # This defines the PalmPDB class, which represents a Palm Database as a whole.
 
+class NoAppinfoClass < Exception
+end
+
+class NoSortinfoClass < Exception
+end
+
 class PalmPDB
   attr_reader :records, :index
   attr_accessor :header, :appinfo, :sortinfo
   include Enumerable
 
-  def initialize()
+  def initialize(opts = {})
     @index = []
     @records = {}
     @appinfo = nil
     @sortinfo = nil
     @header = PDB::Header.new()
+
+    if opts[:appinfo_class].nil?
+      appinfo_class_name = self.class.name + "::AppInfo"
+      begin
+        @appinfo_class = Kernel.const_get_from_string(appinfo_class_name)
+      rescue NameError
+        # Ignore the error, if it happens.
+      end
+      if @appinfo_class.nil? # or @appinfo_struct_class == PalmPDB::AppInfo
+        raise NoAppinfoClass
+      end
+    else
+      @appinfo_class = opts[:appinfo_class]
+    end
+
+    if opts[:sortinfo_class].nil?
+      sortinfo_class_name = self.class.name + "::SortInfo"
+      begin
+        @sortinfo_class = Kernel.const_get_from_string(sortinfo_class_name)
+      rescue NameError
+        # Ignore the error, if it happens.
+      end
+      if @sortinfo_class.nil? or @sortinfo_class == PalmPDB::SortInfo
+        raise NoSortinfoClass
+      end
+    else
+      @sortinfo_class = opts[:sortinfo_class]
+    end
+
+    if opts[:data_class].nil?
+      @data_class = PDB::Data
+      begin
+        @data_class = Kernel.const_get_from_string(self.class.name + "::Resource")
+      rescue
+      end
+
+      begin
+        @data_class = Kernel.const_get_from_string(self.class.name + "::Record")
+      rescue
+      end
+    else
+      @data_class = opts[:data_class]
+    end
+
   end
 
   def each(&block)
