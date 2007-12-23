@@ -147,4 +147,20 @@ class PalmPDB
     @records[r_id] = data
   end
 
+  # Either delete the data with the r_id of a number, or the provide the object to delete.
+  def delete(thing)
+    if thing.is_a? Integer
+      @index = @index.delete_if {|idx|  idx.r_id == thing }
+      @records = @records.delete_if {|idx, data|  idx == thing }
+    else
+      if thing.respond_to?(:r_id)
+        r_id = thing.r_id
+        @index = @index.delete_if {|idx| idx.r_id == r_id }
+        @records = @records.delete_if {|idx, data|  data == thing}
+      end
+    end
+    res_index = @header.resource_index
+    res_index.number_of_records = @index.length
+    @header.resource_index = res_index
+  end
 end

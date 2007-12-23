@@ -28,10 +28,10 @@ class PDBModifyingTest < Test::Unit::TestCase
     db.recompute_offsets
 
     tf = Tempfile.new('pdbtest')
-    tf_dump = Tempfile.new('new_dump')
     db.dump(tf)
     tf.close
-
+    tf_dump = Tempfile.new('pdbdump')
+    
     orig_dump = Tempfile.new('orig_dump')
     original = `pilot-file -d #{$datadir + "/fuelLogDB.pdb"} > #{orig_dump.path}`
 
@@ -46,6 +46,23 @@ class PDBModifyingTest < Test::Unit::TestCase
 _EOD_
 
     assert diff == correct_diff
+    assert $?.exitstatus == 1  # Diff shows a difference
+
+    db.delete(r.metadata.r_id)
+    db.recompute_offsets
+    # puts db.to_yaml
+  
+    tf = Tempfile.new('orig_cpy')
+    db.dump(tf)
+    tf.close
+  
+    tf_dump = Tempfile.new('orig_cpy_dump')
+
+    recreated = `pilot-file -d #{tf.path} > #{tf_dump.path}`
+    diff = `diff #{orig_dump.path} #{tf_dump.path}`
+
+    assert diff == ""
+    assert $?.exitstatus == 0  # Diff shows no difference
   end
 
 end
