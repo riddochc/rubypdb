@@ -78,6 +78,10 @@ class PDB::FuelLog::Record < PDB::Data
     @struct.notes
   end
 
+  def notes=(val)
+    @struct.notes = val + "\0"
+  end
+
   def to_yaml(opts = {})
     YAML::quick_emit( self.object_id, opts ) do |out|
       out.map( to_yaml_style ) do |map|
