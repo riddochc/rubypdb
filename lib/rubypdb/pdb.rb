@@ -132,12 +132,11 @@ class PalmPDB
 
   # Add a (possibly subclassed) PDB::Data to the PDB
   def <<(data)
-    unless data.metadata.r_id != 0  # If it already has an r_id assigned, don't bother.
-      data.metadata.r_id = @next_r_id
-      res_index = @header.resource_index
-      res_index.number_of_records += 1
-      @header.resource_index = res_index
-      @index << data.metadata
+    # If it already has an r_id assigned, don't bother assigning it one.
+    unless data.metadata.r_id != 0 
+      metadata = data.metadata
+      metadata.r_id = @next_r_id
+      data.metadata = metadata
       @next_r_id += 1
     end
 
@@ -145,7 +144,44 @@ class PalmPDB
   end
 
   def []=(r_id, data)
+    # Make sure the data's metadata record is consistent with the r_id assigned to it.
+    if data.metadata.r_id != r_id
+      metadata = data.metadata
+      metadata.r_id = r_id
+      data.metadata = metadata
+    end
+
+    # If we're not overwriting an existing record, the number of records increases.
+    # If not, the index entry needs replacing.
+    if @records[r_id].nil?
+      res_index = @header.resource_index
+      res_index.number_of_records += 1
+      @header.resource_index = res_index
+    else
+      @index = @index.delete_if {|i| i.r_id == r_id }
+    end
+
+    @index << data.metadata
     @records[r_id] = data
+  end
+
+  def records=(data)
+    @index = []
+    @records = {}
+    @next_r_id = 1
+    if data.is_a? Array  # There's no r_ids already assigned.
+      data.each do |rec|
+        metadata = rec.metadata
+        metadata.r_id = @next_r_id
+        rec.metadata = metadata
+        self[rec.metadata.r_id] = rec
+        @next_r_id += 1
+      end
+    elsif data.is_a? Hash
+      data.each_pair do |r_id, rec|
+        self[r_id] = data
+      end
+    end
   end
 
   # Either delete the data with the r_id of a number, or the provide the object to delete.
