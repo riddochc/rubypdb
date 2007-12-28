@@ -145,6 +145,8 @@ class PalmPDB
     f.pos = entry.offset
     data = f.read()  # Read to the end
     @records[entry.r_id] = @data_class.new(self, :metadata => entry, :binary_data => data)
+    
+    @next_r_id = @index.collect {|i| i.r_id }.max + 1
   end
 
 end

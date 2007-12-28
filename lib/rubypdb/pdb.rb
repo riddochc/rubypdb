@@ -17,6 +17,7 @@ class PalmPDB
     @appinfo = nil
     @sortinfo = nil
     @header = PDB::Header.new()
+    @next_r_id = 1
 
     if opts[:appinfo_class].nil?
       appinfo_class_name = self.class.name + "::AppInfo"
@@ -132,12 +133,12 @@ class PalmPDB
   # Add a (possibly subclassed) PDB::Data to the PDB
   def <<(data)
     unless data.metadata.r_id != 0  # If it already has an r_id assigned, don't bother.
-      highest_id = @index.collect {|i| i.r_id }.max
-      data.metadata.r_id = highest_id + 1
+      data.metadata.r_id = @next_r_id
       res_index = @header.resource_index
       res_index.number_of_records += 1
       @header.resource_index = res_index
       @index << data.metadata
+      @next_r_id += 1
     end
 
     self[data.metadata.r_id] = data
