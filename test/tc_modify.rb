@@ -11,24 +11,27 @@ require 'tempfile'
 $datadir = File.join(File.dirname(__FILE__), 'data')
 
 class PDBModifyingTest < Test::Unit::TestCase
-  def test_insert_record
-    db = PDB::FuelLog.new()
+  def setup
+    @db = PDB::FuelLog.new()
     f = File.open($datadir + "/fuelLogDB.pdb")
-    db.load(f)
+    @db.load(f)
+  end
 
-    r = PDB::FuelLog::Record.new(db)
+  def test_insert_record
+    r = PDB::FuelLog::Record.new(@db)
     r.odometer = 140000
     r.gallons = 10.2
     r.price = 30.25
     r.date = Date.new(2007, 12, 28)
     r.fulltank = true
     r.category = "Corolla"
+    r.notes = ""
 
-    db << r
-    db.recompute_offsets
+    @db << r
+    @db.recompute_offsets
 
     tf = Tempfile.new('pdbtest')
-    db.dump(tf)
+    @db.dump(tf)
     tf.close
     tf_dump = Tempfile.new('pdbdump')
     
@@ -49,12 +52,12 @@ _EOD_
     assert diff == correct_diff
     assert $?.exitstatus == 1  # Diff shows a difference
 
-    db.delete(r.metadata.r_id)
-    db.recompute_offsets
+    @db.delete(r.metadata.r_id)
+    @db.recompute_offsets
     # puts db.to_yaml
   
     tf = Tempfile.new('orig_cpy')
-    db.dump(tf)
+    @db.dump(tf)
     tf.close
   
     tf_dump = Tempfile.new('orig_cpy_dump')
