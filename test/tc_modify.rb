@@ -20,7 +20,7 @@ class PDBModifyingTest < Test::Unit::TestCase
     r.odometer = 140000
     r.gallons = 10.2
     r.price = 30.25
-    r.date = Date.today
+    r.date = Date.new(2007, 12, 28)
     r.fulltank = true
     r.category = "Corolla"
 
@@ -41,7 +41,7 @@ class PDBModifyingTest < Test::Unit::TestCase
     correct_diff =<<_EOD_
 118a119,121
 > 21\t16\t0x0\t1\t0x3d01b
-> 0000: 00 02 22 e0 00 00 27 d8 cf 97 00 00 76 2a 00 01   .."`..'XO...v*..
+> 0000: 00 02 22 e0 00 00 27 d8 cf 9c 00 00 76 2a 00 01   .."`..'XO...v*..
 > 
 _EOD_
 
