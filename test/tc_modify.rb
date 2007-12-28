@@ -39,9 +39,10 @@ class PDBModifyingTest < Test::Unit::TestCase
     diff = `diff #{orig_dump.path} #{tf_dump.path}`
 
     correct_diff =<<_EOD_
-118a119,121
-> 21\t16\t0x0\t1\t0x3d01b
+118a119,122
+> 21\t17\t0x0\t1\t0x3d01b
 > 0000: 00 02 22 e0 00 00 27 d8 cf 9c 00 00 76 2a 00 01   .."`..'XO...v*..
+> 0010: 00                                                .
 > 
 _EOD_
 
