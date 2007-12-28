@@ -65,4 +65,31 @@ _EOD_
     assert $?.exitstatus == 0  # Diff shows no difference
   end
 
+  def test_set_array_of_records
+    a = PDB::FuelLog::Record.new(@db)
+    a.odometer = 140000
+    a.gallons = 10.2
+    a.price = 30.25
+    a.date = Date.new(2007, 12, 28)
+    a.fulltank = true
+    a.category = "Corolla"
+    
+    b = PDB::FuelLog::Record.new(@db)
+    b.odometer = 140300
+    b.gallons = 10.1
+    b.price = 28.75
+    b.date = Date.new(2008, 1, 11)
+    b.fulltank = true
+    b.category = "Corolla"
+    
+    new_data = [a, b]
+    
+    @db.records = new_data
+    assert @db.records.length == 2
+    assert @db.records[1].odometer == a.odometer
+    assert @db.records[2].odometer == b.odometer
+    
+    @db.delete(1)
+    assert @db.records.length == 1
+  end
 end
