@@ -26,18 +26,18 @@ class PDB::Data
     
     if opts[:data_struct_class].nil?
       begin
-        struct_class = Kernel.const_get_from_string(self.class.name + "::Struct")
+        @struct_class = Kernel.const_get_from_string(self.class.name + "::Struct")
       rescue
       end
     else
-      struct_class = opts[:data_struct_class]
+      @struct_class = opts[:data_struct_class]
     end
 
     unless opts[:binary_data].nil?
       load(opts[:binary_data])
     else
-      unless struct_class.nil?
-        @struct = struct_class.new()
+      unless @struct_class.nil?
+        @struct = @struct_class.new()
       end
     end
   end
