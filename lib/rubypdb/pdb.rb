@@ -7,9 +7,10 @@ class NoSortinfoClass < Exception
 end
 
 class PalmPDB
-  attr_reader :records, :index
+  attr_reader :records, :index, :data_class, :appinfo_class, :sortinfo_class
   attr_accessor :header, :appinfo, :sortinfo
   include Enumerable
+
 
   def initialize(opts = {})
     @index = []

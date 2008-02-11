@@ -10,8 +10,10 @@ class PDB::FuelLog < PalmPDB
 end
 
 class PDB::FuelLog::AppInfo < PDB::AppInfo
-  def initialize(*rest)
-    super(true, *rest)  # Uses standard categories.
+  def initialize(pdb)
+    super(pdb,
+          :standard_appinfo => true, # Uses standard categories
+          :struct_class => PDB::FuelLog::AppInfo::Struct)
   end
 end
 

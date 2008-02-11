@@ -20,15 +20,8 @@ class PDB::AppInfo
                            'id' => @data.send("category_id[#{i}]") }
       end
 
-      appinfo_struct_class_name = self.class.name + "::Struct"
-      begin
-       appinfo_struct_class = Kernel.const_get_from_string(appinfo_struct_class_name)
-      rescue NameError
-        puts appinfo_struct_class_name + " does not exist."
-      end
-
-      unless appinfo_struct_class.nil? or appinfo_struct_class == Struct
-        @struct = appinfo_struct_class.new(@data.rest)
+      unless @struct_class.nil? or @struct_class == Struct
+        @struct = @struct_class.new(@data.rest)
       end
     else
       # Not using standard app info block.
@@ -115,7 +108,8 @@ class PalmPDB
       @appinfo_data = f.read(appinfo_length)
 
       unless @appinfo_class.nil?
-        @appinfo = @appinfo_class.new(self, @appinfo_data)
+        @appinfo = @appinfo_class.new(self)
+        @appinfo.load(@appinfo_data)
       else
         @appinfo = nil
       end
@@ -126,7 +120,8 @@ class PalmPDB
       @sortinfo_data = f.read(sortinfo_length)
 
       unless @sortinfo_class.nil?
-        @sortinfo = @sortinfo_class.new(@sortinfo_data)
+        @sortinfo = @sortinfo_class.new(self)
+        @sortinfo.load(@sortinfo_data)
       else
         @sortinfo = nil
       end

@@ -8,16 +8,32 @@ class PDB::AppInfo
   attr_accessor :struct, :standard_appinfo, :data
   attr_reader :categories
 
-  def initialize(standard_appinfo, pdb, *rest)
-    @standard_appinfo = standard_appinfo
+  def initialize(pdb, opts = {})
     @pdb = pdb
-    data = rest.first
 
-    unless data.nil?
-      load(data)
+    if opts[:standard_appinfo] == true
+      @standard_appinfo = true
+    end
+    
+    if @standard_appinfo == true
+      @categories = []
+    end
+
+    if opts[:struct_class].nil?
+      struct_class_name = self.class.name + "::Struct"
+      begin
+       @struct_class = Kernel.const_get_from_string(struct_class_name)
+      rescue NameError
+        puts struct_class_name + " does not exist."
+      end
+    else
+      @struct_class = opts[:struct_class]
+    end
+    
+    unless @struct_class.nil? or @struct_class == Struct
+     @struct = @struct_class.new()
     end
   end
-
 
   # If val is an integer, find the string for the category at that index.
   # If it's a string, return the index of the category with that name.
