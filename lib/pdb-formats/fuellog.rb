@@ -91,16 +91,16 @@ class PDB::FuelLog::Record < PDB::Data
   def to_yaml(opts = {})
     YAML::quick_emit( self.object_id, opts ) do |out|
       out.map( to_yaml_style ) do |map|
-        map.add('Date', self.date)
-        map.add('Odometer', self.odometer)
-        map.add('Total_Price', self.price)
-        map.add('Gallons', self.gallons)
+        map.add('date', self.date)
+        map.add('odometer', self.odometer)
+        map.add('price', self.price)
+        map.add('gallons', self.gallons)
         if @struct.fulltank == 1
-          map.add('Full_tank', true)
+          map.add('fulltank', true)
         else
-          map.add('Full_tank', false)
+          map.add('fulltank', false)
         end
-        map.add('Metadata', self.metadata)
+        map.add('metadata', self.metadata)
       end
     end
   end
