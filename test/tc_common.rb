@@ -5,17 +5,12 @@ require 'test/unit'
 
 class GetConstFromStringTest < Test::Unit::TestCase
   def test_string
-    c = Kernel.const_get_from_string("String")
-    assert c == String
-    assert_raise(NameError) do
-      n = Kernel.const_get_from_string("NonExistentClass")
-    end
+    assert_equal "String".get_full_const, String
+    assert_nil "NonExistentClass".get_full_const
   end
 
   def test_from_core_pdb_classes
-    c = Kernel.const_get_from_string("PDB")
-    assert c == PDB
-    c = Kernel.const_get_from_string("PDB::FuelLog::Record::Struct")
-    assert c == PDB::FuelLog::Record::Struct
+    assert_equal "PDB".get_full_const, PDB
+    assert_equal "PDB::FuelLog::Record::Struct".get_full_const, PDB::FuelLog::Record::Struct
   end
 end

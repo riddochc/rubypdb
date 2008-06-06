@@ -72,13 +72,22 @@ class String
     end
     hex
   end
-end
-
-def Kernel.const_get_from_string(str)
-  rname_list = str.split('::')
-  accum_class = Kernel
-  rname_list.each {|c|
-    accum_class = accum_class.const_get(c.to_sym)
-  }
-  accum_class
+  
+  def get_full_const()
+    list = self.split("::")
+    list.shift if list.first == ""
+    type = Object
+    list.each do |c|
+      begin
+        if type.const_defined?(c)
+          type = type.const_get(c)
+        else
+          type = type.const_missing(c)
+        end
+      rescue NameError
+        return nil
+      end
+    end
+    return type
+  end
 end

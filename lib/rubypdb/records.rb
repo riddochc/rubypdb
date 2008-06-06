@@ -5,42 +5,47 @@ module PDB
 end
 
 class PDB::Data
-  attr_accessor :struct, :metadata
-
   def initialize(pdb, opts = {})
     @pdb = pdb
 
-    unless opts[:metadata].nil?
-      @metadata = opts[:metadata]
-    else
-      if opts[:metadata_class].nil?
-        if self.class.name =~ /Record$/
-          @metadata = PDB::Record.new()
-        elsif self.class.name =~ /Resource$/
-          @metadata = PDB::Resource.new()
-        end
-      else
-        @metadata = opts[:metadata_class].new()
+    if opts[:metadata_class].nil?
+      if self.class.name =~ /Record$/
+        @metadata_class = PDB::Record
+      elsif self.class.name =~ /Resource$/
+        @metadata_class = PDB::Resource
       end
+    else
+      @metadata_class = opts[:metadata_class]
     end
     
-    if opts[:data_struct_class].nil?
-      begin
-        @struct_class = Kernel.const_get_from_string(self.class.name + "::Struct")
-      rescue
-      end
-    else
-      @struct_class = opts[:data_struct_class]
-    end
-
-    unless opts[:binary_data].nil?
-      load(opts[:binary_data])
-    else
-      unless @struct_class.nil?
-        @struct = @struct_class.new()
-      end
+    @metadata = @metadata_class.new()
+    
+    # If there isn't a data_struct_class, don't make a @struct thing for it.
+    @struct_class = opts[:data_struct_class] || (self.class.name + "::Struct").get_full_const
+    
+    unless @struct_class.nil? or @struct_class == Struct
+      @struct = @struct_class.new()
     end
   end
+
+  def metadata=(stuff)
+    @metadata = @metadata_class.new(stuff)
+  end
+  
+  def metadata()
+    @metadata
+  end
+  
+  def struct=()
+    unless @struct_class.nil?
+      @struct = @struct_class.new()
+    end
+  end
+  
+  def struct()
+    @struct
+  end
+  
 
   def pdb=(p)
     @pdb = p

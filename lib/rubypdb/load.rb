@@ -33,14 +33,8 @@ end
 
 class PDB::Data
   def load(data)
-    format_class_name = self.class.name + "::Struct"
-    begin
-      format_class = Kernel.const_get_from_string(format_class_name)
-    rescue NameError
-      # puts format_class_name + " does not exist."
-    end
+    format_class = (self.class.name + "::Struct").get_full_const
 
-    # puts "Format class: #{format_class}"
     unless format_class.nil? or format_class == Struct
       @struct = format_class.new(data)
     end

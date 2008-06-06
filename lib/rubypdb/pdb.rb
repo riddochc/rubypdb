@@ -20,49 +20,44 @@ class PalmPDB
     @header = PDB::Header.new()
     @next_r_id = 1
 
+
     if opts[:appinfo_class].nil?
-      appinfo_class_name = self.class.name + "::AppInfo"
-      begin
-        @appinfo_class = Kernel.const_get_from_string(appinfo_class_name)
-      rescue NameError
-        # Ignore the error, if it happens.
-      end
-      if @appinfo_class.nil? # or @appinfo_struct_class == PalmPDB::AppInfo
-        raise NoAppinfoClass
+      @appinfo_class = (self.class.name + "::AppInfo").get_full_const
+      if @appinfo_class.nil?
+        @appinfo_class = PalmPDB::AppInfo
       end
     else
       @appinfo_class = opts[:appinfo_class]
     end
 
     if opts[:sortinfo_class].nil?
-      sortinfo_class_name = self.class.name + "::SortInfo"
-      begin
-        @sortinfo_class = Kernel.const_get_from_string(sortinfo_class_name)
-      rescue NameError
-        # Ignore the error, if it happens.
-      end
-      if @sortinfo_class.nil? or @sortinfo_class == PalmPDB::SortInfo
-        raise NoSortinfoClass
+      @sortinfo_class = (self.class.name + "::SortInfo").get_full_const
+      if @sortinfo_class.nil?
+        @sortinfo_class = PalmPDB::SortInfo
       end
     else
       @sortinfo_class = opts[:sortinfo_class]
     end
 
     if opts[:data_class].nil?
-      @data_class = PDB::Data
-      begin
-        @data_class = Kernel.const_get_from_string(self.class.name + "::Resource")
-      rescue
-      end
-
-      begin
-        @data_class = Kernel.const_get_from_string(self.class.name + "::Record")
-      rescue
+      options = [self.class.name + "::Resource", self.class.name + "::Record"]
+      options.map! {|c| c.get_full_const }.compact!
+      
+      if options == []
+        @data_class = PDB::Data
+      else
+        @data_class = options.first
       end
     else
       @data_class = opts[:data_class]
     end
+    
 
+    if @data_class == PDB::Data
+      @data_struct_class = nil
+    else
+      @data_struct_class = opts[:data_struct_class] || (@data_class.name + "::Struct").get_full_const
+    end
   end
 
   def each(&block)

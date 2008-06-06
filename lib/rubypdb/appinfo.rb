@@ -19,17 +19,8 @@ class PDB::AppInfo
       @categories = []
     end
 
-    if opts[:struct_class].nil?
-      struct_class_name = self.class.name + "::Struct"
-      begin
-       @struct_class = Kernel.const_get_from_string(struct_class_name)
-      rescue NameError
-        puts struct_class_name + " does not exist."
-      end
-    else
-      @struct_class = opts[:struct_class]
-    end
-    
+    @struct_class = opts[:struct_class] || (self.class.name + "::Struct").get_full_const
+
     unless @struct_class.nil? or @struct_class == Struct
      @struct = @struct_class.new()
     end
