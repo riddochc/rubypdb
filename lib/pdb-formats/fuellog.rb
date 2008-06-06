@@ -31,6 +31,10 @@ class PDB::FuelLog::AppInfo::Struct < BitStruct
 end
 
 class PDB::FuelLog::Record < PDB::Data
+  def initialize(pdb, opts = {})
+    opts[:data_struct_class] = PDB::FuelLog::Record::Struct
+    super(pdb, opts)
+  end
 
   def odometer
     @struct.odometer

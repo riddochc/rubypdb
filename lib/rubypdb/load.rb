@@ -122,20 +122,34 @@ class PalmPDB
         @sortinfo = nil
       end
     end
-
+    
+    r_opts = {}
+    unless @data_struct_class.nil?
+      r_opts[:data_struct_class] = @data_struct_class
+    end
+    
     i = 0
     @index.each_cons(2) do |curr, nxt|
       length = nxt.offset - curr.offset  # Find the length to the next record
       f.pos = curr.offset
       data = f.read(length)
-      @records[curr.r_id] = @data_class.new(self, :metadata => curr, :binary_data => data)
+      
+      rec = @data_class.new(self, r_opts)
+      rec.metadata = curr
+      rec.load(data)
+      
+      @records[curr.r_id] = rec # @data_class.new(self, :metadata => curr, :binary_data => data)
       i = i + 1 
     end
     # ... And then the last one.
     entry = @index.last
     f.pos = entry.offset
     data = f.read()  # Read to the end
-    @records[entry.r_id] = @data_class.new(self, :metadata => entry, :binary_data => data)
+    
+    rec = @data_class.new(self, r_opts)
+    rec.metadata = entry
+    rec.load(data)
+    @records[entry.r_id] = rec # @data_class.new(self, :metadata => entry, :binary_data => data)
     
     @next_r_id = @index.collect {|i| i.r_id }.max + 1
   end
