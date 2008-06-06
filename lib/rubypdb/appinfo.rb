@@ -3,6 +3,28 @@
 module PDB
 end
 
+class PDB::AppInfo::Category
+  attr_reader :name
+  attr_accessor :id, :renamed
+  
+  def initialize(appinfo, opts = {})
+    @appinfo = appinfo
+    @name = opts[:name] || ""
+    @id = opts[:id] || 0
+    @renamed = opts[:renamed] || false
+  end
+  
+  # Renaming a category.
+  def name=(str)
+    if str.length > 16
+      raise "Category name too long (should be <= 16 bytes)"
+    else
+      @name = str
+      @renamed = true
+    end
+  end
+end
+
 # Higher-level interface to PDB::StandardAppInfoBlock
 class PDB::AppInfo
   attr_accessor :struct, :standard_appinfo, :data
@@ -26,28 +48,69 @@ class PDB::AppInfo
     end
   end
 
-  # If val is an integer, find the string for the category at that index.
-  # If it's a string, return the index of the category with that name.
+  # Dual-lookup: Look up a category by either id or name.
   def category(val)
     if val.is_a? Integer
-      return @categories[val]['name']
+      @categories.find {|c| c.id == val }
     else
-      found = nil
-      @categories.each_with_index do |c, i|
-        if c['name'] == val
-          found = i
-          break
-        end
-      end
-
-      return found
+      @categories.find {|c| c.name == val.to_s }
     end
   end
-
-  def new_category(name)
-    puts "Making new category called #{name}"
+  
+  # Look up the category object by offset, or the offset by the category object
+  def category_offset(i)
+    if i.is_a? Integer
+      @categories[i]
+    else
+      @categories.index(i)
+    end
   end
+  
+  def add_category(opts = {})
+    name = opts[:name]
+    id = opts[:id]
+    renamed = opts[:renamed] || false
+    offset = opts[:offset]
+    
+    if category(name) or category(id)
+      raise "Category already exists with that name or id!"
+    end
+    
+    if @categories.length >= 16
+      raise "Too many categories"
+    end
+    
+    if id.nil?
+      if @data.last_unique_id == 255
+        # Find the first unused id
+        category_ids = @categories.sort_by {|c| c.id }.collect {|c| c.id }
+        0.upto(255) do |i|
+          unless category_ids.include?(i)
+            id = i
+          end
+        end
+      else
+        id = @data.last_unique_id + 1
+        @data.last_unique_id = id
+      end
+    end
+    
+    if offset.nil?
+      # Find first unused offset - either index of a nil slot, or next available.
+      offset = @categories.index(nil) || @categories.length
+    else
+      unless @categories.index(offset).nil?
+        raise "Offset of category already used!"
+      end
+    end
 
+    c = PDB::AppInfo::Category.new(self, :name => name, :id => id, :renamed => renamed)
+    @categories[offset] = c
+    return c
+  end
+  
+  def rename_category(old, new)
+  end
 
   def length()
     unless @struct.nil?

@@ -11,13 +11,15 @@ class PDB::AppInfo
       # Using standard app info block
       @data = PDB::StandardAppInfoBlock.new(data)
 
-      # Define better structures for categories.
-      # It's a list, of length 16.
-      # At each position, there's a one-element hash. of name and id.
       @categories = []
       16.times do |i|
-        @categories[i] = { 'name' => @data.send("category_name[#{i}]"),
-                           'id' => @data.send("category_id[#{i}]") }
+        name = @data.send("category_name[#{i}]")
+        id = @data.send("category_id[#{i}]")
+        renamed = (@data.renamed_categories[i] == 1) # Is the ith bit 1?
+        if name != ""
+          c = PDB::AppInfo::Category.new(self, :name => name, :id => id, :renamed => renamed)
+          @categories << c
+        end
       end
 
       unless @struct_class.nil? or @struct_class == Struct

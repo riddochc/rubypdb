@@ -60,14 +60,22 @@ class PDB::Data
   end
 
   def category()
-    cat = @metadata.attributes.category
-    @pdb.appinfo.category(cat)
+    if @pdb.appinfo.standard_appinfo == true and @metadata_class == PDB::Record
+      c = @metadata.attributes.category
+      @pdb.appinfo.category_offset(c)
+    end
   end
 
   def category=(val)
-    cat = @pdb.appinfo.category(val) # || @pdb.appinfo.new_category(val)
-    attr = PDB::RecordAttributes.new(@metadata.attributes)
-    attr.category = cat
-    @metadata.attributes = attr
+    if @pdb.appinfo.standard_appinfo == true and @metadata_class == PDB::Record
+      unless val.is_a? PDB::AppInfo::Category
+        raise "Value should be an instance of PDB::AppInfo::Category"
+      end
+      offset = @pdb.appinfo.category_offset(val)
+      # if cat.nil?
+      attr = PDB::RecordAttributes.new(@metadata.attributes)
+      attr.category = offset
+      @metadata.attributes = attr
+    end
   end
 end

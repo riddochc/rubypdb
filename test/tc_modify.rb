@@ -24,7 +24,8 @@ class PDBModifyingTest < Test::Unit::TestCase
     r.price = 30.25
     r.date = Date.new(2007, 12, 28)
     r.fulltank = true
-    r.category = "Corolla"
+    
+    r.category = @db.appinfo.category('Corolla')
     r.notes = ""
 
     @db << r
@@ -76,7 +77,7 @@ _EOD_
     a.price = 30.25
     a.date = Date.new(2007, 12, 28)
     a.fulltank = true
-    a.category = "Corolla"
+    a.category = @db.appinfo.category("Corolla")
     
     b = PDB::FuelLog::Record.new(@db)
     b.odometer = 140300
@@ -84,7 +85,7 @@ _EOD_
     b.price = 28.75
     b.date = Date.new(2008, 1, 11)
     b.fulltank = true
-    b.category = "Corolla"
+    b.category = @db.appinfo.category("Corolla")
     
     new_data = [a, b]
     
