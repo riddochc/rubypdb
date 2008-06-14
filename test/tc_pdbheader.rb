@@ -36,10 +36,9 @@ class PDBHeaderTest < Test::Unit::TestCase
     a.dump(tf)
     tf.close
 
-    puts
-    puts `hexdump -C #{tf.path}`
+    # puts `hexdump -C #{tf.path}`
     recreated = `pilot-file -d #{tf.path}`
-    puts recreated
+    # puts recreated
     original = `pilot-file -d #{testfile}`
     assert recreated == original
   end

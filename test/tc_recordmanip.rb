@@ -18,16 +18,14 @@ class PDBRecordTest < Test::Unit::TestCase
     a = PDB::FuelLog.new()
     f = File.open($datadir + "/fuelLogDB.pdb")
     a.load(f)
-    puts a.appinfo.struct.to_yaml
-    puts
+    #puts a.appinfo.struct.to_yaml
     a.each {|r|
-      puts "Date: #{r.date}"
-      puts "Odometer: #{r.odometer}"
-      puts "Gallons: #{r.gallons}"
-      puts "Price: #{r.price}"
-      puts "Filled tank: #{r.fulltank}"
+      # puts "Date: #{r.date}"
+      # puts "Odometer: #{r.odometer}"
+      # puts "Gallons: #{r.gallons}"
+      # puts "Price: #{r.price}"
+      # puts "Filled tank: #{r.fulltank}"
       # puts "Notes: #{r.notes}"
-      puts
     }
   end
 end
