@@ -2,6 +2,10 @@
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="20a4fda8-8cbd-4347-bf3a-24af04797742" kpf_version="4" name="rubypdb.kpf">
 <preference-set idref="20a4fda8-8cbd-4347-bf3a-24af04797742">
+  <string id="import_type">useFolders</string>
+  <string id="import_exclude_matches">*.*~;*.bak;*.tmp;CVS;.#*;*.pyo;*.pyc;.svn;*%*;tmp*.html;.DS_Store;.git</string>
+  <boolean id="import_recursive">1</boolean>
+  <string id="import_include_matches"></string>
   <boolean id="import_live">1</boolean>
 </preference-set>
 </project>
