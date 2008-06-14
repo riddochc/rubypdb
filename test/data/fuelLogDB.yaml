@@ -1,4 +1,4 @@
---- !syntacticsugar.org,2007/PalmPDB:PDB::FuelLog
+--- !syntacticsugar.org,2007/PalmPDB:PDB::FuelLog 
 Name: fuelLogDB
 Type: Data
 Creator: dpa1
@@ -26,14 +26,19 @@ Flags: !path.berkeley.edu,2006/bitstruct:PDB::AttributeFlags
   dirty: 0
   read_only: 0
   resource: 0
-AppInfo: 
+AppInfo: &id001 
   Standard_appinfo: true
   Categories: 
-  - name: Unfiled
+  - !ruby/object:PDB::AppInfo::Category 
+    appinfo: *id001
     id: 0
-  - name: Corolla
+    name: Unfiled
+    renamed: true
+  - !ruby/object:PDB::AppInfo::Category 
+    appinfo: *id001
     id: 17
-  Renamed_categories: 3
+    name: Corolla
+    renamed: true
   Last_unique_id: 17
   Custom_Appinfo_Data: !path.berkeley.edu,2006/bitstruct:PDB::FuelLog::AppInfo::Struct 
     fuel_volume: 0

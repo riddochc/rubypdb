@@ -112,6 +112,10 @@ class PDB::AppInfo
   def rename_category(old, new)
   end
 
+  def renamed_categories()
+    @categories.find_all {|c| c.renamed == true }
+  end
+
   def length()
     unless @struct.nil?
       if @standard_appinfo == true

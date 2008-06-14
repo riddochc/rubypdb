@@ -5,6 +5,8 @@ module PDB
 end
 
 class PDB::Data
+  attr_reader :metadata_class
+  
   def initialize(pdb, opts = {})
     @pdb = pdb
 

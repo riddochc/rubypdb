@@ -16,9 +16,9 @@ class PDBYamlTest < Test::Unit::TestCase
     f = File.open($datadir + "/fuelLogDB.pdb")
     a.load(f)
     src_yaml = a.to_yaml
-
     dest_yaml = File.open($datadir + "/fuelLogDB.yaml").read(nil)
 
+    # File.open($datadir + '/test-out.yaml', 'w') {|f| f.write(a.to_yaml) }
     assert src_yaml.to_s == dest_yaml.to_s
   end
 
@@ -29,9 +29,12 @@ class PDBYamlTest < Test::Unit::TestCase
 
     b = YAML.load(File.open($datadir + "/fuelLogDB.yaml"))
 
-    puts "The thing loaded: #{b}"
-    # puts "Number of records: #{b.records.length}"
-
-    assert a == b
+    a_io = StringIO.new()
+    a.dump(a_io)
+    
+    b_io = StringIO.new()
+    b.dump(b_io)
+    
+    assert a_io.read() == b_io.read()
   end
 end

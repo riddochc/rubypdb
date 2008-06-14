@@ -10,12 +10,9 @@ class PDB::AppInfo
         if self.standard_appinfo == true
           cats = []
           self.categories.each do |c|
-            unless c['name'] == ""
-              cats << c
-            end
+            cats << c
           end
           map.add('Categories', cats)
-          map.add('Renamed_categories', self.data.renamed_categories)
           map.add('Last_unique_id', self.data.last_unique_id)
           map.add('Custom_Appinfo_Data', self.struct)
         else
@@ -26,9 +23,25 @@ class PDB::AppInfo
   end
   
   def new_from_yaml(val)
-    puts "Making new appinfo from yaml..."
-    if @standard_appinfo == true
+    if ((@standard_appinfo == true) or (val['Standard_appinfo'] == true))
+      @struct = val['Custom_Appinfo_Data']
       
+      @data = PDB::StandardAppInfoBlock.new
+      @data.last_unique_id = val['Last_unique_id']
+      
+      renamed = 0
+      val['Categories'].each_with_index do |cat, i|
+        add_category(:offset => i, :name => cat.name,
+                     :id => cat.id, :renamed => cat.renamed)
+        if (cat.renamed == true)
+          renamed = renamed + (2 ** i)
+        end
+      end
+      @data.renamed_categories = renamed
+      
+      @data.rest = @struct
+    else 
+      @data = val['Data']
     end
   end
 end
@@ -63,7 +76,7 @@ end
 
 class PDB::Data
   def to_yaml(opts = {})
-    puts "Writing record to yaml:"
+    
   end
   
   def new_from_yaml(yaml_data)
@@ -71,11 +84,11 @@ class PDB::Data
       raise YAML::TypeError, "Invalid record: " + yaml_data.inspect
     end
     
-    puts "Loading record from yaml:"
     yaml_data.each_pair do |key, value|
-      self.send("#{key}=".to_sym, value)  # Run "self.key = value"
+      unless key == 'metadata'
+        self.send("#{key}=".to_sym, value)  # Run "self.key = value"
+      end
     end
-    
   end
 end
 
@@ -110,8 +123,6 @@ class PalmPDB
 
     pdb_name, pdb_type =  YAML.read_type_class( tag, PalmPDB)
 
-    puts "Parsing: #{pdb_name}, #{pdb_type}"
-
     pdb = pdb_type.new
     pdb.header.name = val['Name']
     pdb.header.type = val['Type']
@@ -126,27 +137,26 @@ class PalmPDB
 
     pdb.header.attributes = val['Flags']
     
-    puts "The appinfo class is: #{pdb.appinfo_class}"
-    @appinfo = pdb.appinfo_class.new(self)
-    @appinfo.new_from_yaml(val['AppInfo'])
-    
+    appinfo = pdb.appinfo_class.new(pdb)
+    appinfo.new_from_yaml(val['AppInfo'])
+    pdb.appinfo = appinfo
+
     #@sortinfo = pdb.sortinfo_class.new(self)
     #@sortinfo.set_from_yaml_hash(val['SortInfo'])
 
     data_class = pdb.data_class
     
-    records = val['Records'].collect {|yaml_rec|
+    pdb.records = {}
+    val['Records'].each {|yaml_rec|
       rec = data_class.new(pdb)
       rec.new_from_yaml(yaml_rec)
-#       metadata_struct = rec.metadata
-#       metadata_hash = yaml_rec['Metadata']
-#       metadata_hash.each_pair {|name, value|
-#         metadata_struct.send("#{name}=".to_sym, value)
-#       }
-#      yaml_rec.delete('Metadata')
-#      yaml_rec.each_pair {|name, value|
-#        rec.send("#{name}=".to_sym, value)  # rec.name = value
-#      }
+      
+      metadata = rec.metadata_class.new()
+      metadata.r_id = yaml_rec['metadata']['r_id']
+      metadata.attributes = yaml_rec['metadata']['attributes']
+      rec.metadata = metadata
+
+      pdb.records[rec.metadata.r_id] = rec
     }
 
     pdb.recompute_offsets
